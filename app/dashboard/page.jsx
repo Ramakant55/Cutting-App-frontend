@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { AlertCircle, Calculator, Trash2, Check, X, RefreshCw } from "lucide-react"
+import { AlertCircle, Calculator, Trash2, Check, X, RefreshCw, Copy, ClipboardCheck } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { toast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
@@ -71,6 +71,7 @@ export default function NumberTrackerPage() {
   const [editingIndex, setEditingIndex] = useState(-1)
   const [editValueInput, setEditValueInput] = useState("")
   const [isLoading, setIsLoading] = useState(true)
+  const [hasCopied, setHasCopied] = useState(false)
   
   // Ref for the numbers input field
   const numbersInputRef = useRef(null)
@@ -105,15 +106,21 @@ export default function NumberTrackerPage() {
                 const numStr = String(numberKey).padStart(2, '0')
                 
                 // Each value in our frontend needs to be an array
-                // So we convert single values to arrays with one item
+                // We'll fetch the history for each number if available
                 if (!processedData[numStr]) {
                   processedData[numStr] = []
                 }
                 
-                // Add the value to the array (as a single element)
+                // Store the total value as individual entries (for backward compatibility)
+                // This is a workaround until the backend returns full history per number
                 if (typeof value === 'number') {
-                  // Store the total as a single value in the array
-                  processedData[numStr] = [value]
+                  // If the backend sends a history array, use that instead
+                  if (data.history && data.history[numberKey] && Array.isArray(data.history[numberKey])) {
+                    processedData[numStr] = [...data.history[numberKey]]
+                  } else {
+                    // Fallback: Store the total as a single value in the array
+                    processedData[numStr] = [value]
+                  }
                 }
               })
               
@@ -321,28 +328,61 @@ export default function NumberTrackerPage() {
     // Add the value to each valid number
     const newNumberValues = { ...numberValues }
     
-    // Create a partial object containing ONLY the numbers being modified now
-    const updatedNumbers = {}
+    // Track each number being modified, including duplicate entries
+    const entries = []
     
-    // Count occurrences of each valid number to handle duplicates properly
-    validNumbers.forEach((num) => {
-      if (!updatedNumbers[num]) {
-        updatedNumbers[num] = []
-      }
-      // Add a new value for each occurrence of the number
-      updatedNumbers[num].push(value)
-      
-      // Also update the state with each occurrence
+    // Process each valid number entry (including duplicates)
+    for (const num of validNumbers) {
+      // Add to local state
       if (!newNumberValues[num]) {
         newNumberValues[num] = []
       }
       newNumberValues[num].push(value)
-    })
+      
+      // Create a separate entry for each occurrence (even if it's the same number)
+      entries.push({
+        numberKey: num, 
+        value: value,
+        isAddValue: true // Add to existing value
+      })
+    }
 
     setNumberValues(newNumberValues)
 
-    // Save to API - only sending the newly added values, not all values
-    await saveDataToAPI(updatedNumbers)
+    // Save to API - directly send individual entries including duplicates
+    const token = localStorage.getItem('token')
+    if (token) {
+      try {
+        // Send each entry separately to ensure all duplicates are processed
+        for (const entry of entries) {
+          const response = await fetch("https://kdm-cuttingapp.onrender.com/api/data", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(entry),
+          })
+          
+          if (!response.ok) {
+            throw new Error("Failed to save data")
+          }
+        }
+        
+        toast({
+          title: "Data saved",
+          description: "Your number data has been saved successfully.",
+        })
+      } catch (error) {
+        console.error("Error saving data to API:", error)
+        toast({
+          variant: "destructive",
+          title: "Error saving data",
+          description: "There was a problem saving your data.",
+          action: <ToastAction altText="Try again">Try again</ToastAction>,
+        })
+      }
+    }
 
     setInputError("")
     setNumbersInput("")
@@ -531,6 +571,36 @@ export default function NumberTrackerPage() {
       cancelEditing()
     }
   }
+  
+  // Copy excess numbers to clipboard
+  const copyExcessNumbers = () => {
+    // Get only the numbers with excess values AND their excess amounts
+    const excessNumbersWithValues = numbers
+      .filter((number) => getExcessAmount(number) > 0)
+      .map((number) => `${number}(${getExcessAmount(number)})`)
+      .join(", ")
+      
+    if (excessNumbersWithValues) {
+      navigator.clipboard.writeText(excessNumbersWithValues)
+        .then(() => {
+          setHasCopied(true)
+          toast({
+            title: "Copied to clipboard",
+            description: "Excess numbers have been copied to clipboard.",
+          })
+          // Reset the copied state after 2 seconds
+          setTimeout(() => setHasCopied(false), 2000)
+        })
+        .catch(err => {
+          console.error("Failed to copy text: ", err)
+          toast({
+            variant: "destructive",
+            title: "Copy failed",
+            description: "Failed to copy to clipboard. Try again.",
+          })
+        })
+    }
+  }
 
   if (isLoading) {
     return (
@@ -716,7 +786,21 @@ export default function NumberTrackerPage() {
 
               <div className="grid grid-cols-1 gap-3 md:gap-4 mb-3 md:mb-4">
                 <div className="p-4 bg-amber-100 rounded-md">
-                  <div className="text-sm text-muted-foreground mb-1">Excess Amounts (All Numbers)</div>
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm text-muted-foreground mb-1">Excess Amounts (All Numbers)</div>
+                    {numbers.some(number => getExcessAmount(number) > 0) && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="h-8 px-2 ml-2" 
+                        onClick={copyExcessNumbers} 
+                        title="Copy all excess numbers"
+                      >
+                        {hasCopied ? <ClipboardCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                        <span className="ml-1 hidden md:inline">Copy Numbers</span>
+                      </Button>
+                    )}
+                  </div>
                   <div className="text-lg font-medium break-words">{consolidatedExcess}</div>
                   <div className="mt-2 grid grid-cols-2 gap-2">
                     <div>
