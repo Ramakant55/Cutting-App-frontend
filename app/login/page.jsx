@@ -61,9 +61,17 @@ export default function Login() {
         throw new Error(data.error || "Login failed");
       }
 
-      // Store token in localStorage
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      // Store token in localStorage with try-catch for webview compatibility
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
+      } catch (storageErr) {
+        console.warn("Unable to access localStorage:", storageErr);
+        // You could implement an alternative storage method here if needed
+        // For example, using sessionStorage, cookies, or state management
+      }
       
       // Navigate to dashboard
       router.push('/dashboard');

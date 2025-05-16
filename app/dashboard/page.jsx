@@ -40,18 +40,29 @@ export default function NumberTrackerPage() {
 
   // Check if user is authenticated
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const userData = localStorage.getItem('user')
-    
-    if (!token || !userData) {
-      router.push('/login')
-      return
-    }
-
     try {
-      setUser(JSON.parse(userData))
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const token = localStorage.getItem('token')
+        const userData = localStorage.getItem('user')
+        
+        if (!token || !userData) {
+          router.push('/login')
+          return
+        }
+
+        try {
+          setUser(JSON.parse(userData))
+        } catch (err) {
+          console.error('Error parsing user data:', err)
+          router.push('/login')
+        }
+      } else {
+        // No localStorage available (common in some webviews)
+        console.warn('localStorage not available')
+        router.push('/login')
+      }
     } catch (err) {
-      console.error('Error parsing user data:', err)
+      console.error('Error accessing localStorage:', err)
       router.push('/login')
     }
   }, [router])
@@ -147,17 +158,36 @@ export default function NumberTrackerPage() {
       }
     }
     
-    const token = localStorage.getItem('token')
-    if (token) {
-      loadData()
-    } else {
+    let token
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        token = localStorage.getItem('token')
+        if (token) {
+          loadData()
+        } else {
+          setIsLoading(false)
+        }
+      } else {
+        console.warn('localStorage not available in this environment')
+        setIsLoading(false)
+      }
+    } catch (err) {
+      console.error('Error accessing localStorage:', err)
       setIsLoading(false)
     }
   }, [])
 
   // Save data to API
   const saveDataToAPI = async (newNumberValues = numberValues, isAddingNewValues = true) => {
-    const token = localStorage.getItem('token')
+    let token
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        token = localStorage.getItem('token')
+      }
+    } catch (err) {
+      console.error('Error accessing localStorage:', err)
+    }
+    
     if (!token) {
       toast({
         variant: "destructive",
