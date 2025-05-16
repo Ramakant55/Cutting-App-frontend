@@ -40,22 +40,19 @@ export default function NumberTrackerPage() {
 
   // Check if user is authenticated
   useEffect(() => {
-    // Safely access localStorage only on client side
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token')
-      const userData = localStorage.getItem('user')
-      
-      if (!token || !userData) {
-        router.push('/login')
-        return
-      }
+    const token = localStorage.getItem('token')
+    const userData = localStorage.getItem('user')
+    
+    if (!token || !userData) {
+      router.push('/login')
+      return
+    }
 
-      try {
-        setUser(JSON.parse(userData))
-      } catch (err) {
-        console.error('Error parsing user data:', err)
-        router.push('/login')
-      }
+    try {
+      setUser(JSON.parse(userData))
+    } catch (err) {
+      console.error('Error parsing user data:', err)
+      router.push('/login')
     }
   }, [router])
   
@@ -82,9 +79,6 @@ export default function NumberTrackerPage() {
   // Load data from API on initial render when authenticated
   useEffect(() => {
     async function loadData() {
-      // Safely access localStorage only on client side
-      if (typeof window === 'undefined') return
-      
       const token = localStorage.getItem('token')
       if (token) {
         try {
@@ -163,7 +157,6 @@ export default function NumberTrackerPage() {
 
   // Save data to API
   const saveDataToAPI = async (newNumberValues = numberValues, isAddingNewValues = true) => {
-    if (typeof window === 'undefined') return
     const token = localStorage.getItem('token')
     if (!token) {
       toast({
@@ -357,7 +350,6 @@ export default function NumberTrackerPage() {
     setNumberValues(newNumberValues)
 
     // Save to API - directly send individual entries including duplicates
-    if (typeof window === 'undefined') return
     const token = localStorage.getItem('token')
     if (token) {
       try {
@@ -466,7 +458,6 @@ export default function NumberTrackerPage() {
       delete newValues[number]
       
       // Call the delete endpoint to remove the number completely from backend
-      if (typeof window === 'undefined') return
       const token = localStorage.getItem('token')
       if (token) {
         try {
@@ -629,11 +620,9 @@ export default function NumberTrackerPage() {
             <p className="font-medium">Welcome, {user?.name || user?.email || user?.phone}</p>
           </div>
           <Button variant="outline" onClick={() => {
-            if (typeof window !== 'undefined') {
-              localStorage.removeItem('token')
-              localStorage.removeItem('user')
-              router.push('/login')
-            }
+            localStorage.removeItem('token')
+            localStorage.removeItem('user')
+            router.push('/login')
           }}>
             Logout
           </Button>
