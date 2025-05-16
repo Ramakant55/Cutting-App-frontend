@@ -613,7 +613,7 @@ export default function NumberTrackerPage() {
   return (
     <div className="container mx-auto py-4 px-2 md:py-8 md:px-4">
       <header className="flex justify-between items-center mb-8 pb-4 border-b">
-        <h1 className="text-3xl font-bold">ESI Number Tracker</h1>
+        <h1 className="text-xl md:text-3xl font-bold">ESI Number Tracker</h1>
         
         <div className="flex items-center gap-4">
           <div>
@@ -631,7 +631,7 @@ export default function NumberTrackerPage() {
       
       <Card className="mb-6">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
-          <CardTitle className="text-lg md:text-2xl">Number Value Tracker</CardTitle>
+          <CardTitle className="text-xl md:text-2xl">Number Value Tracker</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 md:gap-4 mb-4 md:mb-6">
