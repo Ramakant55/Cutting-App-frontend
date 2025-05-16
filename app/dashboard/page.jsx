@@ -613,7 +613,7 @@ export default function NumberTrackerPage() {
   return (
     <div className="container mx-auto py-4 px-2 md:py-8 md:px-4">
       <header className="flex justify-between items-center mb-8 pb-4 border-b">
-        <h1 className="text-xl md:text-3xl font-bold">ESI Number Tracker</h1>
+        <h1 className="text-xl md:text-3xl font-bold">ESI</h1>
         
         <div className="flex items-center gap-4">
           <div>
