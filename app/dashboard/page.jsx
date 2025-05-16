@@ -323,11 +323,20 @@ export default function NumberTrackerPage() {
     
     // Create a partial object containing ONLY the numbers being modified now
     const updatedNumbers = {}
+    
+    // Count occurrences of each valid number to handle duplicates properly
     validNumbers.forEach((num) => {
-      // Add the new value to the number's array
-      newNumberValues[num] = [...(newNumberValues[num] || []), value]
-      // Add only this number to the updatedNumbers object
-      updatedNumbers[num] = [value] // Only sending the new value, not all values
+      if (!updatedNumbers[num]) {
+        updatedNumbers[num] = []
+      }
+      // Add a new value for each occurrence of the number
+      updatedNumbers[num].push(value)
+      
+      // Also update the state with each occurrence
+      if (!newNumberValues[num]) {
+        newNumberValues[num] = []
+      }
+      newNumberValues[num].push(value)
     })
 
     setNumberValues(newNumberValues)
