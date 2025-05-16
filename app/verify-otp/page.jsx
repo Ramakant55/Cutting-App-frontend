@@ -46,7 +46,7 @@ function VerifyOTPContent() {
     try {
       setLoading(true);
       
-      const response = await fetch("http://localhost:5000/api/auth/verify-otp", {
+      const response = await fetch("https://kdm-cuttingapp.onrender.com/api/auth/verify-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +81,7 @@ function VerifyOTPContent() {
       setResendDisabled(true);
       setCountdown(60); // 60 seconds countdown
       
-      const response = await fetch("http://localhost:5000/api/auth/resend-otp", {
+      const response = await fetch("https://kdm-cuttingapp.onrender.com/api/auth/resend-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

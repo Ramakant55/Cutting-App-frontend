@@ -82,7 +82,7 @@ export default function NumberTrackerPage() {
       if (token) {
         try {
           setIsLoading(true)
-          const response = await fetch("http://localhost:5000/api/data", {
+          const response = await fetch("https://kdm-cuttingapp.onrender.com/api/data", {
             headers: {
               "Authorization": `Bearer ${token}`,
               "Content-Type": "application/json"
@@ -168,7 +168,7 @@ export default function NumberTrackerPage() {
       // First, clear all existing values if we're not adding new values
       if (!isAddingNewValues) {
         // Using the edit endpoint to clear values
-        await fetch("http://localhost:5000/api/data/edit", {
+        await fetch("https://kdm-cuttingapp.onrender.com/api/data/edit", {
           method: "PUT",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -208,7 +208,7 @@ export default function NumberTrackerPage() {
       
       // Save each entry individually
       for (const entry of entries) {
-        const response = await fetch("http://localhost:5000/api/data", {
+        const response = await fetch("https://kdm-cuttingapp.onrender.com/api/data", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -412,7 +412,7 @@ export default function NumberTrackerPage() {
       const token = localStorage.getItem('token')
       if (token) {
         try {
-          await fetch(`http://localhost:5000/api/data/delete/${number}`, {
+          await fetch(`https://kdm-cuttingapp.onrender.com/api/data/delete/${number}`, {
             method: "DELETE",
             headers: {
               "Authorization": `Bearer ${token}`,
@@ -456,7 +456,7 @@ export default function NumberTrackerPage() {
     if (token) {
       try {
         // Use the edit endpoint with clearAll:true to remove all data
-        await fetch("http://localhost:5000/api/data/edit", {
+        await fetch("https://kdm-cuttingapp.onrender.com/api/data/edit", {
           method: "PUT",
           headers: {
             "Authorization": `Bearer ${token}`,
