@@ -61,9 +61,11 @@ export default function Login() {
         throw new Error(data.error || "Login failed");
       }
 
-      // Store token in localStorage
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      // Store token in localStorage - only on client side
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
       
       // Navigate to dashboard
       router.push('/dashboard');
