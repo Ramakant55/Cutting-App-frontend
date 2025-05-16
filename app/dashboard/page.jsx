@@ -631,7 +631,7 @@ export default function NumberTrackerPage() {
       
       <Card className="mb-6">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
-          <CardTitle className="text-xl md:text-2xl">Number Value Tracker</CardTitle>
+          <CardTitle className="text-lg md:text-2xl">Number Value Tracker</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 md:gap-4 mb-4 md:mb-6">
