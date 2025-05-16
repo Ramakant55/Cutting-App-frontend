@@ -103,8 +103,8 @@ function VerifyOTPContent() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4 md:px-0">
+      <Card className="w-full max-w-md mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl text-center">Verify Email</CardTitle>
           <CardDescription className="text-center">

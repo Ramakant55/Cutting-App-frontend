@@ -75,8 +75,8 @@ export default function Login() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4 md:px-0">
+      <Card className="w-full max-w-md mx-auto">
         <CardHeader className="space-y-1">
           <div className="flex justify-between items-center">
             <CardTitle className="text-2xl font-bold">Login</CardTitle>
