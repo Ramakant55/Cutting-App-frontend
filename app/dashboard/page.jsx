@@ -380,7 +380,14 @@ export default function NumberTrackerPage() {
     setNumberValues(newNumberValues)
 
     // Save to API - directly send individual entries including duplicates
-    const token = localStorage.getItem('token')
+    let token;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        token = localStorage.getItem('token')
+      }
+    } catch (err) {
+      console.error('Error accessing localStorage:', err)
+    }
     if (token) {
       try {
         // Send each entry separately to ensure all duplicates are processed
@@ -488,7 +495,14 @@ export default function NumberTrackerPage() {
       delete newValues[number]
       
       // Call the delete endpoint to remove the number completely from backend
-      const token = localStorage.getItem('token')
+      let token;
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          token = localStorage.getItem('token')
+        }
+      } catch (err) {
+        console.error('Error accessing localStorage:', err)
+      }
       if (token) {
         try {
           await fetch(`https://kdm-cuttingapp.onrender.com/api/data/delete/${number}`, {
@@ -531,7 +545,14 @@ export default function NumberTrackerPage() {
     cancelEditing()
 
     // Clear all data in the database
-    const token = localStorage.getItem('token')
+    let token;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        token = localStorage.getItem('token')
+      }
+    } catch (err) {
+      console.error('Error accessing localStorage:', err)
+    }
     if (token) {
       try {
         // Use the edit endpoint with clearAll:true to remove all data
@@ -650,8 +671,14 @@ export default function NumberTrackerPage() {
             <p className="font-medium">Welcome, {user?.name || user?.email || user?.phone}</p>
           </div>
           <Button variant="outline" onClick={() => {
-            localStorage.removeItem('token')
-            localStorage.removeItem('user')
+            try {
+              if (typeof window !== 'undefined' && window.localStorage) {
+                localStorage.removeItem('token')
+                localStorage.removeItem('user')
+              }
+            } catch (err) {
+              console.error('Error accessing localStorage:', err)
+            }
             router.push('/login')
           }}>
             Logout
